@@ -2,46 +2,74 @@ import React, { useState } from 'react';
 import { StyleSheet} from 'react-native';
 import {
   ViroARScene,
-  ViroARSceneNavigator,
-  ViroText,
-  ViroTrackingReason,
+  ViroPolyline,
   ViroTrackingStateConstants,
+  ViroText,
 } from '@reactvision/react-viro';
 
-const HelloWorldSceneAR = () => {
-  const [text, setText] = useState('Initializing AR...');
-
-  function onInitialized(state: any, reason: ViroTrackingReason) {
-    console.log('onInitialized', state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      setText('Hello World!');
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
-    }
-  }
-
-  return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
-      <ViroText
-        text={text}
-        scale={[0.5, 0.5, 0.5]}
-        position={[0.5, 0, -1]}
-        style={styles.helloWorldTextStyle}
-      />
-    </ViroARScene>
-  );
-};
 
 const Home = () => {
+const [pathPoints, setPathPoints] = useState(
+  [
+    { position: [0,-1, -1] },
+    { position: [0, -1, -2] },
+    { position: [0, -1, -3] },
+    { position: [0, -1, -4] },
+    { position: [0.5, -1, -5] },
+    { position: [0.6, -1, -4] },
+    { position: [0.7, -1, -3] },
+    { position: [0.8, -1, -1] },
+  ]
+);
+
+
+
+
+const onTrackingUpdated = (anchor) => {
+  console.log('anchor: ', anchor);
+  if (anchor.tracking === ViroTrackingStateConstants.TRACKING_NORMAL) {
+    console.log('CALLED');
+
+    // Tracking is normal; you can handle further navigation logic here if needed.
+  }
+};
+  const renderPath = () => {
+
+
+    return (
+      <ViroPolyline
+        points={pathPoints.map(point => point.position)}
+        color={'#FF0000'} // Red color for the path
+        // width={0.01} // Adjust the width of the line
+        thickness={0.1}
+      />
+    );
+  };
 
   return (
-    <ViroARSceneNavigator
-    autofocus={true}
-    initialScene={{
-      scene: HelloWorldSceneAR,
-    }}
-    style={styles.f1}
+    <ViroARScene  onTrackingUpdated={onTrackingUpdated}>
+    {renderPath()}
+    {pathPoints.map((point, index) =>
+    {
+      console.log('TEST :: ', point.position);
+
+return     (
+  <ViroText
+    key={index}
+    text={`Point ${index }`}
+    scale={[0.5, 0.5, 0.5]}
+
+    position={point.position} // Position slightly above the path
+    style={styles.helloWorldTextStyle}
+
+    // textAlign="center"
+
   />
+);
+    }
+
+    )}
+  </ViroARScene>
   );
 };
 

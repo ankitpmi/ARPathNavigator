@@ -1,9 +1,15 @@
 import React from 'react';
 import Home from './src/screens/home/Home';
+import { ViroARSceneNavigator } from '@reactvision/react-viro';
 
 const App = () => {
   return (
-    <Home />
+    // <Home />
+    <ViroARSceneNavigator
+      initialScene={{
+        scene: Home,
+      }}
+    />
   );
 };
 
