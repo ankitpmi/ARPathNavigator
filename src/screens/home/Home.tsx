@@ -47,7 +47,7 @@ const onTrackingUpdated = (anchor) => {
   };
 
   return (
-    <ViroARScene  onTrackingUpdated={onTrackingUpdated}>
+    <ViroARScene   onTrackingUpdated={onTrackingUpdated}>
     {renderPath()}
     {pathPoints.map((point, index) =>
     {

@@ -6,6 +6,9 @@
     <!-- You may need these if doing any screen recording from within the app -->
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 <!-- Other camera related features -->
 <uses-feature android:name="android.hardware.camera" />
 <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" tools:replace="required"/>
@@ -23,6 +26,22 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true"
       android:supportsRtl="true">
+  <meta-data
+    android:name="com.supersami.foregroundservice.notification_channel_name"
+    android:value="Sticky Title"
+  />
+  <meta-data
+    android:name="com.supersami.foregroundservice.notification_channel_description"
+    android:value="Sticky Description."
+  />
+  <meta-data
+    android:name="com.supersami.foregroundservice.notification_color"
+    android:resource="@color/blue"
+  />
+ 
+  <service android:name="com.supersami.foregroundservice.ForegroundService"></service> // also define android:foregroundServiceType="" according to your use case
+  <service android:name="com.supersami.foregroundservice.ForegroundServiceTask"></service> // also define android:foregroundServiceType="" according to your use case
+
       <meta-data android:name="com.google.ar.core" android:value="optional" />
       <meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
       <activity

@@ -2634,6 +2634,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@supersami/rn-foreground-service@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "@supersami/rn-foreground-service@npm:2.2.1"
+  peerDependencies:
+    react-native: ">=0.59.0"
+  checksum: d45fbee96c10817a13c53e0823ce7cf237dbc12d1501afb33a0ff0325f14673778f2cab1c3f50585c89ab58bb61d754ae92f982f7b9e1de83f5cba703b1eee65
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.1.14":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -3013,6 +3022,7 @@ __metadata:
     "@react-native/metro-config": 0.75.4
     "@react-native/typescript-config": 0.75.4
     "@reactvision/react-viro": ^2.41.6
+    "@supersami/rn-foreground-service": ^2.2.1
     "@types/react": ^18.2.6
     "@types/react-test-renderer": ^18.0.0
     babel-jest: ^29.6.3
@@ -3021,6 +3031,7 @@ __metadata:
     prettier: 2.8.8
     react: 18.3.1
     react-native: 0.75.4
+    react-native-geolocation-service: ^5.3.1
     react-test-renderer: 18.3.1
     typescript: 5.0.4
   languageName: unknown
@@ -7983,6 +7994,13 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
+  languageName: node
+  linkType: hard
+
+"react-native-geolocation-service@npm:^5.3.1":
+  version: 5.3.1
+  resolution: "react-native-geolocation-service@npm:5.3.1"
+  checksum: 9a625c9f87811933491055fd8cbd1ef46f97fbbe0262714ad1d9aa969a8900dcb4abc47e58fe162400a81bcdee79324dfcc8e631862df9a22d59ac84af9acfde
   languageName: node
   linkType: hard
 
