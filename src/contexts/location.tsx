@@ -41,7 +41,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
 
   const [initialLocation, setInitialLocation] = useState<GeoCoordinates>();
 
-  const [watchId, setWatchId] = useState(0);
+  const [watchId, setWatchId] = useState<number | null>(0);
 
   const startTracking = useCallback(async () => {
     Geolocation.requestAuthorization('always');
@@ -71,7 +71,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
         );
         console.log('distance: ', distance.toFixed());
         // }
-        if (distance > 5) {
+        if (distance > 3) {
           setCurrentLocation(prevState =>
             prevState !== position.coords ? position.coords : prevState,
           );
@@ -161,7 +161,10 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
 
   const clearWatchHandler = () => {
     console.log('watchId in function ::: ', watchId);
-    Geolocation.clearWatch(watchId);
+    if (watchId !== null) {
+      Geolocation.clearWatch(watchId);
+      setWatchId(null);
+    }
   };
 
   return (

@@ -13,7 +13,7 @@ import { useLocationContext } from '../../contexts';
 
 const Home = () => {
   const {currentLocation,initialLocation} = useLocationContext();
-  const [pathPoints, setPathPoints] = useState([{position: [0, -1, -1]}]);
+  const [pathPoints, setPathPoints] = useState([{position: [0, -2, -1]}]);
   // const [pathPoints, setPathPoints] = useState(
   //   [
   //     { position: [0,-1, -1] },
