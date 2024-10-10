@@ -37,10 +37,10 @@ const Home = () => {
         initialLocation,
         currentLocation,
       );
-      console.log('distance ::: ', positionData.distance);
-      // if (positionData.distance > 1) {
-      //   setPathPoints(preState => [...preState, {position: positionData.position}]);
-      // }
+      // console.log('distance ::: ', positionData.distance);
+      if (positionData.distance > 1) {
+        setPathPoints(preState => [...preState, {position: positionData.position}]);
+      }
     }
   }, [currentLocation, initialLocation]);
 
@@ -68,7 +68,7 @@ const Home = () => {
   return (
     <>
       <ViroARScene onTrackingUpdated={onTrackingUpdated}>
-        {/* {renderPath()} */}
+        {renderPath()}
         {pathPoints.map((point, index) => {
           return (
             <ViroText

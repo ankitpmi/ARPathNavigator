@@ -3,6 +3,11 @@ import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import { PermissionsAndroid } from 'react-native';
 
+interface LatLang {
+  latitude: number
+  longitude: number
+}
+
 export interface LocationContextType {
   initialLocation: GeoCoordinates | undefined;
   currentLocation: GeoCoordinates | undefined;
@@ -29,7 +34,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
   >();
 
   const [initialLocation, setInitialLocation] = useState<
-    GeoCoordinates | undefined
+    GeoCoordinates
   >();
 
   const startTracking = useCallback(async () => {
@@ -43,14 +48,22 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
         // See error code charts below.
         console.log(error.code, error.message);
       },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+      {enableHighAccuracy: false, timeout: 15000, maximumAge: 10000},
     );
 
     Geolocation.watchPosition(
       position => {
-        setCurrentLocation(prevState =>
-          prevState !== position.coords ? position.coords : prevState,
-        );
+          const distance = calculateDistance({latitude: currentLocation?.latitude ?? 23.0710301, longitude: currentLocation?.longitude ?? 72.5181042}, {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          console.log('distance: ', distance.toFixed());
+        // }
+        if (distance > 5) {
+          setCurrentLocation(prevState =>
+            prevState !== position.coords ? position.coords : prevState,
+          );
+        }
       },
       error => {
         console.log('maperror in getting location', error.code, error.message);
@@ -63,7 +76,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
         fastestInterval: 0,
       },
     );
-  }, []);
+  }, [currentLocation?.latitude, currentLocation?.longitude]);
   const Notification = useCallback(() => {
     ReactNativeForegroundService.start({
       id: 1244,
@@ -92,10 +105,10 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
 
   useEffect(() => {
     requestLocationPermission();
-    updateforeground();
-    Notification();
+    // updateforeground();
+    // Notification();
     startTracking();
-  }, [Notification, startTracking, updateforeground]);
+  }, [ startTracking]);
 
   const requestLocationPermission = async () => {
     Geolocation.requestAuthorization('always');
@@ -139,4 +152,26 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
     </LocationContext.Provider>
     </>
   );
+};
+
+
+// Utility to calculate distance between two locations using Haversine formula
+function degToRad(deg: number) {
+  return deg * (Math.PI / 180);
+}
+const calculateDistance = (prevPos: LatLang, newPos: LatLang) => {
+
+  const R = 6371000; // Radius of the Earth in meters
+    const dLat = degToRad(newPos.latitude - prevPos.latitude);
+    const dLon = degToRad(newPos.longitude - prevPos.longitude);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(degToRad(prevPos.latitude)) * Math.cos(degToRad(newPos.latitude)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distanceInMeters = R * c; // Distance in meters
+    return distanceInMeters;
 };

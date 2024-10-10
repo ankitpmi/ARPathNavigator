@@ -29,8 +29,8 @@ export function calculateARPosition(currentLocation:GeoCoordinates, targetLocati
   // This assumes that x is east-west, z is north-south, and y is up-down
   const xPosition = deltaLon * R; // East-west displacement in meters
   let zPosition = deltaLat * R; // North-south displacement in meters
-  zPosition = -Math.abs(zPosition);
-  const yPosition = -1; // Fixed height
+  // zPosition = -Math.abs(zPosition);
+  const yPosition = -2; // Fixed height
 
   return {position:[ xPosition, yPosition, zPosition ], distance};
 }
