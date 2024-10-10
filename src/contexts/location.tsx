@@ -1,25 +1,31 @@
 import Geolocation, {GeoCoordinates} from 'react-native-geolocation-service';
 import ReactNativeForegroundService from '@supersami/rn-foreground-service';
-import React, {createContext, useCallback, useContext, useEffect, useState} from 'react';
-import { PermissionsAndroid } from 'react-native';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {PermissionsAndroid} from 'react-native';
 
 interface LatLang {
-  latitude: number
-  longitude: number
+  latitude: number;
+  longitude: number;
 }
 
 export interface LocationContextType {
   initialLocation: GeoCoordinates | undefined;
   currentLocation: GeoCoordinates | undefined;
+  clearWatchHandler: () => void;
 }
 
-export interface LocationProviderProps extends React.PropsWithChildren{
-
-}
+export interface LocationProviderProps extends React.PropsWithChildren {}
 
 const initialContext: LocationContextType = {
   currentLocation: undefined,
   initialLocation: undefined,
+  clearWatchHandler: () => null,
 };
 
 export const LocationContext =
@@ -33,9 +39,9 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
     GeoCoordinates | undefined
   >();
 
-  const [initialLocation, setInitialLocation] = useState<
-    GeoCoordinates
-  >();
+  const [initialLocation, setInitialLocation] = useState<GeoCoordinates>();
+
+  const [watchId, setWatchId] = useState(0);
 
   const startTracking = useCallback(async () => {
     Geolocation.requestAuthorization('always');
@@ -51,13 +57,19 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
       {enableHighAccuracy: false, timeout: 15000, maximumAge: 10000},
     );
 
-    Geolocation.watchPosition(
+    let getWatchId = Geolocation.watchPosition(
       position => {
-          const distance = calculateDistance({latitude: currentLocation?.latitude ?? 23.0710301, longitude: currentLocation?.longitude ?? 72.5181042}, {
+        const distance = calculateDistance(
+          {
+            latitude: currentLocation?.latitude ?? 23.0710301,
+            longitude: currentLocation?.longitude ?? 72.5181042,
+          },
+          {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-          });
-          console.log('distance: ', distance.toFixed());
+          },
+        );
+        console.log('distance: ', distance.toFixed());
         // }
         if (distance > 5) {
           setCurrentLocation(prevState =>
@@ -76,6 +88,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
         fastestInterval: 0,
       },
     );
+    setWatchId(getWatchId);
   }, [currentLocation?.latitude, currentLocation?.longitude]);
   const Notification = useCallback(() => {
     ReactNativeForegroundService.start({
@@ -108,7 +121,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
     // updateforeground();
     // Notification();
     startTracking();
-  }, [ startTracking]);
+  }, [startTracking]);
 
   const requestLocationPermission = async () => {
     Geolocation.requestAuthorization('always');
@@ -145,33 +158,40 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
       console.warn(err);
     }
   };
-  return(
+
+  const clearWatchHandler = () => {
+    console.log('watchId in function ::: ', watchId);
+    Geolocation.clearWatch(watchId);
+  };
+
+  return (
     <>
-    <LocationContext.Provider value={{currentLocation, initialLocation}}>
-      {children}
-    </LocationContext.Provider>
+      <LocationContext.Provider
+        value={{currentLocation, initialLocation, clearWatchHandler}}>
+        {children}
+      </LocationContext.Provider>
     </>
   );
 };
-
 
 // Utility to calculate distance between two locations using Haversine formula
 function degToRad(deg: number) {
   return deg * (Math.PI / 180);
 }
 const calculateDistance = (prevPos: LatLang, newPos: LatLang) => {
-
   const R = 6371000; // Radius of the Earth in meters
-    const dLat = degToRad(newPos.latitude - prevPos.latitude);
-    const dLon = degToRad(newPos.longitude - prevPos.longitude);
+  const dLat = degToRad(newPos.latitude - prevPos.latitude);
+  const dLon = degToRad(newPos.longitude - prevPos.longitude);
 
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(degToRad(prevPos.latitude)) * Math.cos(degToRad(newPos.latitude)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(degToRad(prevPos.latitude)) *
+      Math.cos(degToRad(newPos.latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distanceInMeters = R * c; // Distance in meters
-    return distanceInMeters;
+  const distanceInMeters = R * c; // Distance in meters
+  return distanceInMeters;
 };

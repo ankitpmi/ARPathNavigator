@@ -63,7 +63,7 @@ const Home = () => {
     );
   };
 
-  console.log('PATH ::: ', pathPoints);
+  // console.log('PATH ::: ', pathPoints);
 
   return (
     <>
