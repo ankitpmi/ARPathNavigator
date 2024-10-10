@@ -35,10 +35,15 @@ export function calculateARPosition(currentLocation:GeoCoordinates, targetLocati
   return {position:[ xPosition, yPosition, zPosition ], distance};
 }
 
-// // Example current and target locations
-// const currentLocation = { latitude: 23.0709984, longitude: 72.5180965 };
-// const targetLocation = { latitude: 23.071500, longitude: 72.518500 };
+// const clampValue = (value: number, min: number, max: number) =>
+//   Math.max(min, Math.min(max, value));
+// const convertGeoToAR = (latitude: number, longitude: number) => {
+//   const scaleFactor = 10000; // Adjust this factor as needed
 
-// // Get AR coordinates
-// const arPosition = calculateARPosition(currentLocation, targetLocation);
-// console.log(arPosition);
+//   // Calculate AR position
+//   const xPosition = clampValue(longitude * scaleFactor, 1, -1); // X = Longitude
+//   const yPosition = -1; // Always -1 as per your requirement
+//   const zPosition = clampValue(-latitude * scaleFactor, 1, -1); // Z = -Latitude (depth)
+
+//   return [xPosition, yPosition, zPosition]; // Return AR coordinates
+// }
