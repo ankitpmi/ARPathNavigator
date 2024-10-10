@@ -8,6 +8,7 @@ import {
 } from '@reactvision/react-viro';
 import Geolocation, {GeoCoordinates} from 'react-native-geolocation-service';
 import ReactNativeForegroundService from '@supersami/rn-foreground-service';
+import { calculateARPosition } from '../utils/helper';
 
 // interface Data {
 //   position: Array<Number>
@@ -17,29 +18,50 @@ const Home = () => {
   const [currentLocation, setCurrentLocation] = useState<
     GeoCoordinates | undefined
   >();
-  const [pathPoints, setPathPoints] = useState([{position: [0, 0, 0]}]);
 
-  // const [pathPoints, setPathPoints] = useState();
+  const [initialLocation, setInitialLocation] = useState<
+  GeoCoordinates | undefined
+>();
+  const [pathPoints, setPathPoints] = useState([{position: [0, -1, -1]}]);
+    // const [pathPoints, setPathPoints] = useState(
+  //   [
+  //     { position: [0,-1, -1] },
+  //     { position: [0, -1, -2] },
+  //     { position: [0, -1, -3] },
+  //     { position: [0, -1, -4] },
+  //     { position: [0.5, -1, -5] },
+  //     { position: [0.6, -1, -4] },
+  //     { position: [0.7, -1, -3] },
+  //     { position: [0.8, -1, -1] },
+  //   ]
+  // );
+
 
   // LOCATION LOGIC START
 
   const startTracking = useCallback(async () => {
-    let s = Geolocation.requestAuthorization('always');
-    console.log('s: ', s);
+     Geolocation.requestAuthorization('always');
+
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setInitialLocation(position.coords);
+      },
+      (error) => {
+        // See error code charts below.
+        console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  );
 
     Geolocation.watchPosition(
       position => {
-        let coordinates: any = [];
-        coordinates[0] = position.coords.longitude;
-        coordinates[1] = position.coords.latitude;
-        coordinates[2] = position.coords.altitude;
-        setCurrentLocation(position.coords);
+        setCurrentLocation(prevState => prevState !== position.coords ? position.coords : prevState);
       },
       error => {
         console.log('maperror in getting location', error.code, error.message);
       },
 
-      {enableHighAccuracy: true, distanceFilter: 1},
+      {enableHighAccuracy: true, distanceFilter: 1, interval: 0, fastestInterval: 0},
     );
   }, []);
   const Notification = useCallback(() => {
@@ -124,32 +146,27 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (currentLocation) {
-      const positionData = convertGeoToAR(
-        currentLocation?.latitude,
-        currentLocation?.longitude,
+    if (currentLocation && initialLocation) {
+      // const positionData = convertGeoToAR(
+      //   currentLocation?.latitude,
+      //   currentLocation?.longitude,
+      // );
+      const positionData = calculateARPosition(
+        initialLocation,
+        currentLocation,
       );
+      console.log('distance ::: ', positionData.distance);
+      // if (positionData.distance > 1) {
+      //   setPathPoints(preState => [...preState, {position: positionData.position}]);
+      // }
 
-      setPathPoints(preState => [...preState, {position: positionData}]);
     }
-  }, [convertGeoToAR, currentLocation]);
+  }, [ currentLocation, initialLocation]);
 
   // LOCATION LOGIC END
-  // const [pathPoints, setPathPoints] = useState(
-  //   [
-  //     { position: [0,-1, -1] },
-  //     { position: [0, -1, -2] },
-  //     { position: [0, -1, -3] },
-  //     { position: [0, -1, -4] },
-  //     { position: [0.5, -1, -5] },
-  //     { position: [0.6, -1, -4] },
-  //     { position: [0.7, -1, -3] },
-  //     { position: [0.8, -1, -1] },
-  //   ]
-  // );
+
 
   const onTrackingUpdated = anchor => {
-    console.log('anchor: ', anchor);
     if (anchor.tracking === ViroTrackingStateConstants.TRACKING_NORMAL) {
       console.log('CALLED');
 
@@ -159,7 +176,7 @@ const Home = () => {
   const renderPath = () => {
     return (
       <ViroPolyline
-        // points={pathPoints.map(point => point.position)}
+        points={pathPoints.map(point => point.position)}
         color={'#FF0000'} // Red color for the path
         // width={0.01} // Adjust the width of the line
         thickness={0.1}
@@ -167,13 +184,13 @@ const Home = () => {
     );
   };
 
-  console.log('pathPoints :::::: ', pathPoints);
+  console.log('PATH ::: ', pathPoints);
+
 
   return (
     <ViroARScene onTrackingUpdated={onTrackingUpdated}>
-      {renderPath()}
+      {/* {renderPath()} */}
       {pathPoints.map((point, index) => {
-        // console.log('TEST :: ', point.position);
 
         return (
           <ViroText
@@ -182,7 +199,6 @@ const Home = () => {
             scale={[0.5, 0.5, 0.5]}
             position={point.position} // Position slightly above the path
             style={styles.helloWorldTextStyle}
-
             // textAlign="center"
           />
         );

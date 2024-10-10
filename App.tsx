@@ -5,12 +5,6 @@ import { ViroARSceneNavigator } from '@reactvision/react-viro';
 
 
 const App = () => {
-
-
-
-
-
-
   return (
     // <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
     //   <Text>Test</Text>
