@@ -13,19 +13,19 @@ import { useLocationContext } from '../../contexts';
 
 const Home = () => {
   const {currentLocation,initialLocation} = useLocationContext();
-  const [pathPoints, setPathPoints] = useState([{position: [0, -2, -1]}]);
-  // const [pathPoints, setPathPoints] = useState(
-  //   [
-  //     { position: [0,-1, -1] },
-  //     { position: [0, -1, -2] },
-  //     { position: [0, -1, -3] },
-  //     { position: [0, -1, -4] },
-  //     { position: [0.5, -1, -5] },
-  //     { position: [0.6, -1, -4] },
-  //     { position: [0.7, -1, -3] },
-  //     { position: [0.8, -1, -1] },
-  //   ]
-  // );
+  // const [pathPoints, setPathPoints] = useState([{position: [0, -2, -1]}]);
+  const [pathPoints, setPathPoints] = useState(
+    [
+      { position: [0,-1, -1] },
+      { position: [0, -1, -2] },
+      { position: [0, -1, -3] },
+      { position: [0, -1, -4] },
+      { position: [0.5, -1, -5] },
+      { position: [0.6, -1, -4] },
+      { position: [0.7, -1, -3] },
+      { position: [0.8, -1, -1] },
+    ]
+  );
 
   useEffect(() => {
     if (currentLocation && initialLocation) {
@@ -39,7 +39,7 @@ const Home = () => {
       );
       // console.log('distance ::: ', positionData.distance);
       if (positionData.distance > 1) {
-        setPathPoints(preState => [...preState, {position: positionData.position}]);
+        // setPathPoints(preState => [...preState, {position: positionData.position}]);
       }
     }
   }, [currentLocation, initialLocation]);
