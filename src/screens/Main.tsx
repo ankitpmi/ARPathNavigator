@@ -5,8 +5,8 @@ import Home from './home/Home';
 import {useLocationContext} from '../contexts';
 
 const Main = () => {
-  const {currentLocation, initialLocation, clearWatchHandler} =
-    useLocationContext();
+  // const {currentLocation, initialLocation, clearWatchHandler} =
+  //   useLocationContext();
   return (
     <>
       <ViroARSceneNavigator
@@ -14,7 +14,7 @@ const Main = () => {
           scene: Home,
         }}
       />
-      <View style={{padding: 8}}>
+      {/* <View style={{padding: 8}}>
         <View
           style={{
             marginBottom: 10,
@@ -22,13 +22,13 @@ const Main = () => {
             borderBottomColor: '#000',
           }}>
           <Text style={{fontSize: 14, fontWeight: 600}}>Initial Location:</Text>
-          <Text>Latitude : {initialLocation?.latitude}</Text>
-          <Text>Longitude : {initialLocation?.longitude}</Text>
+          <Text>Latitude : {initialLocation?.coords.latitude}</Text>
+          <Text>Longitude : {initialLocation?.coords.longitude}</Text>
         </View>
         <View>
           <Text style={{fontSize: 14, fontWeight: 600}}>Current Location:</Text>
-          <Text>Latitude : {currentLocation?.latitude}</Text>
-          <Text>Longitude : {currentLocation?.longitude}</Text>
+          <Text>Latitude : {currentLocation?.coords.latitude}</Text>
+          <Text>Longitude : {currentLocation?.coords.longitude}</Text>
         </View>
 
         <Pressable
@@ -42,7 +42,7 @@ const Main = () => {
           }}>
           <Text>Stop Watching</Text>
         </Pressable>
-      </View>
+      </View> */}
     </>
   );
 };

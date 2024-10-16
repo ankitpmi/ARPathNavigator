@@ -1,5 +1,5 @@
-import Geolocation, {GeoCoordinates} from 'react-native-geolocation-service';
-import ReactNativeForegroundService from '@supersami/rn-foreground-service';
+import Geolocation, {GeolocationResponse as GeoCoordinates} from '@react-native-community/geolocation';
+// import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import React, {
   createContext,
   useCallback,
@@ -44,11 +44,12 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
   const [watchId, setWatchId] = useState<number | null>(0);
 
   const startTracking = useCallback(async () => {
-    Geolocation.requestAuthorization('always');
+
+    // Geolocation.requestAuthorization('always');
 
     Geolocation.getCurrentPosition(
       position => {
-        setInitialLocation(position.coords);
+        setInitialLocation(position);
       },
       error => {
         // See error code charts below.
@@ -61,19 +62,19 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
       position => {
         const distance = calculateDistance(
           {
-            latitude: currentLocation?.latitude ?? 23.0710301,
-            longitude: currentLocation?.longitude ?? 72.5181042,
+            latitude: currentLocation?.coords.latitude ?? 23.0710301,
+            longitude: currentLocation?.coords.longitude ?? 72.5181042,
           },
           {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           },
         );
-        console.log('distance: ', distance.toFixed());
+        // console.log('distance: ', distance.toFixed());
         // }
-        if (distance > 3) {
+        if (distance > 1) {
           setCurrentLocation(prevState =>
-            prevState !== position.coords ? position.coords : prevState,
+            prevState !== position ? position : prevState,
           );
         }
       },
@@ -89,32 +90,32 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
       },
     );
     setWatchId(getWatchId);
-  }, [currentLocation?.latitude, currentLocation?.longitude]);
-  const Notification = useCallback(() => {
-    ReactNativeForegroundService.start({
-      id: 1244,
-      title: 'Location Tracking',
-      message: 'Location Tracking',
-      icon: 'ic_launcher',
-      button: false,
-      button2: false,
-      // buttonText: "Button",
-      // button2Text: "Anther Button",
-      // buttonOnPress: "cray",
-      setOnlyAlertOnce: 'true',
-      color: '#000000',
-    });
-    startTracking();
-  }, [startTracking]);
+  }, [currentLocation?.coords.latitude, currentLocation?.coords.longitude]);
+  // const Notification = useCallback(() => {
+  //   ReactNativeForegroundService.start({
+  //     id: 1244,
+  //     title: 'Location Tracking',
+  //     message: 'Location Tracking',
+  //     icon: 'ic_launcher',
+  //     button: false,
+  //     button2: false,
+  //     // buttonText: "Button",
+  //     // button2Text: "Anther Button",
+  //     // buttonOnPress: "cray",
+  //     setOnlyAlertOnce: 'true',
+  //     color: '#000000',
+  //   });
+  //   startTracking();
+  // }, [startTracking]);
 
-  const updateforeground = useCallback(() => {
-    ReactNativeForegroundService.add_task(() => startTracking(), {
-      delay: 100,
-      onLoop: true,
-      taskId: 'taskid',
-      onError: e => console.log('Error logging:', e),
-    });
-  }, [startTracking]);
+  // const updateforeground = useCallback(() => {
+  //   ReactNativeForegroundService.add_task(() => startTracking(), {
+  //     delay: 100,
+  //     onLoop: true,
+  //     taskId: 'taskid',
+  //     onError: e => console.log('Error logging:', e),
+  //   });
+  // }, [startTracking]);
 
   useEffect(() => {
     requestLocationPermission();
@@ -124,7 +125,7 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
   }, [startTracking]);
 
   const requestLocationPermission = async () => {
-    Geolocation.requestAuthorization('always');
+    // Geolocation.requestAuthorization('always');
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -179,10 +180,10 @@ export const LocationProvider = ({children}: LocationProviderProps) => {
 
 // Utility to calculate distance between two locations using Haversine formula
 function degToRad(deg: number) {
-  return deg * (Math.PI / 180);
+  return (deg * Math.PI) / 180;
 }
 const calculateDistance = (prevPos: LatLang, newPos: LatLang) => {
-  const R = 6371000; // Radius of the Earth in meters
+  const R = 6371e3; // Radius of the Earth in meters
   const dLat = degToRad(newPos.latitude - prevPos.latitude);
   const dLon = degToRad(newPos.longitude - prevPos.longitude);
 
