@@ -43,27 +43,26 @@ const Home = () => {
 
 
   const onTrackingUpdated = (state: ViroTrackingState, reason: ViroTrackingReason) => {
-    // console.log('anchor: ', state, ' :: ', reason);
     if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
       setStep(state);
     }
   };
-
-  const getDifference = (value1: number, value2: number) => {
-    console.log('value1: number, value2: number: ', value1, value2);
-    return value1 - value2;
-  };
-
 
 
   const oncameraTransformHandler = (cameraTransform: ViroCameraTransform) => {
     const [fx,fy,fz] = cameraTransform.forward;
 
     const [px,py,pz] = cameraTransform.position;
+
+
+
+
   if (fx < -0.6 ) {
-    const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
+    // console.log('LEFT ::: ');
     if (!(initialNumberToSetLeft > 1)) {
-      // console.log('LEFT ::: ');
+      const lastZval = pathPoints[pathPoints.length - 1].position[2];
+      // const obj:Position = {position: [fx - (-0.12) , -2, -pathPoints.length ]};
+      const obj:Position = {position: [fx - (-0.12) , -2, lastZval  ]};
 
       setPathPoints([...pathPoints, obj]);
       initialNumberToSetLeft = initialNumberToSetLeft + 1;
@@ -71,9 +70,10 @@ const Home = () => {
     }
 
   }else if(fx > 0.6 ){
-    const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
+    // console.log('RIGHT :::');
     if (!(initialNumberToSetRight > 1)) {
-      // console.log('RIGHT :::');
+      const lastZval = pathPoints[pathPoints.length - 1].position[2];
+      const obj:Position = {position: [fx + 0.12, -2, lastZval  ]};
       setPathPoints([...pathPoints, obj]);
       initialNumberToSetRight = initialNumberToSetRight + 1;
       return;
@@ -96,20 +96,18 @@ const Home = () => {
     if (forwardStepCount < stepThreshold) {
       if (!(initialNumberToSetForward > 1)) {
         const xVal = pathPoints[pathPoints.length - 1].position[0];
-        const obj: Position = { position: [xVal, -2, -(pathPoints.length + 2)] };
-        console.log('AAA');
+        const zVal =  -(pathPoints.length + 1);
+        const obj: Position = { position: [xVal, -2, zVal] };
 
         setPathPoints([...pathPoints, obj]);
         initialNumberToSetForward += 1;
       }
-
       forwardStepCount += 1;
     }
 
     // When the forward step count reaches the threshold, reset the counters
-    console.log('forwardStepCount: ', forwardStepCount);
     if (forwardStepCount === stepThreshold) {
-      console.log(`Reached ${stepThreshold} steps forward!`);
+      // console.log(`Reached ${stepThreshold} steps forward!`);
 
       // Reset forward step count and other counters for the next round
       forwardStepCount = 0;              // Reset step counter
@@ -134,10 +132,13 @@ const Home = () => {
     );
   };
 
+  console.log('pathPoints ::: ', pathPoints);
+
+
 
   return (
     <>
-      <ViroARScene onCameraTransformUpdate={oncameraTransformHandler} onTrackingUpdated={onTrackingUpdated} >
+      <ViroARScene anchorDetectionTypes="None" onCameraTransformUpdate={oncameraTransformHandler} onTrackingUpdated={onTrackingUpdated} >
         {renderPath()}
         {pathPoints.map((point, index) => {
           return (
@@ -147,6 +148,7 @@ const Home = () => {
               scale={[0.5, 0.5, 0.5]}
               position={point.position} // Position slightly above the path
               style={styles.helloWorldTextStyle}
+
               // textAlign="center"
             />
           );

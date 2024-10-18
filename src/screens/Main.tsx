@@ -13,6 +13,7 @@ const Main = () => {
         initialScene={{
           scene: Home,
         }}
+        pbrEnabled={true}
       />
       {/* <View style={{padding: 8}}>
         <View
