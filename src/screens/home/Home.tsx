@@ -9,21 +9,20 @@ import {
   ViroTrackingReason,
   ViroCameraTransform,
 } from '@reactvision/react-viro';
-import {calculateARPosition, convertLatLongToAR} from '../../utils/helper';
-import { useLocationContext } from '../../contexts';
+
 
 let initialNumberToSetLeft  = 0;
 let initialNumberToSetRight  = 0;
 let initialNumberToSetForward  = 0;
-let arr: Array<any> = [];
+let forwardStepCount = 0;  // Step counter for forward movement
+const stepThreshold = 200;
 interface Position {
   position: number[]
 }
 const Home = () => {
-  // const {currentLocation,initialLocation} = useLocationContext();
   const [pathPoints, setPathPoints] = useState<Array<Position>>([{position: [0, -2, -2]}]);
   const [step, setStep] = useState(0);
-  const prevValueRef = useRef(0);
+  // const prevValueRef = useRef<number>(0);
 
 
   // const [pathPoints, setPathPoints] = useState(
@@ -40,39 +39,13 @@ const Home = () => {
   //   ]
   // );
 
-  // useEffect(() => {
-  //   if (currentLocation && initialLocation) {
-  //     // const positionData = convertGeoToAR(
-  //     //   currentLocation?.latitude,
-  //     //   currentLocation?.longitude,
-  //     // );
-  //     const positionData = calculateARPosition(
-  //       initialLocation.coords,
-  //       currentLocation.coords,
-  //     );
 
-
-
-  //     // console.log('positionData: ', positionData);
-  //     // console.log('distance ::: ', positionData.distance);
-  //     console.log('distance IN SIDE ::: ', positionData.distance);
-
-  //     if (positionData.distance > 1) {
-  //       arr = [...arr, {lat: currentLocation.coords.latitude, long: currentLocation.coords.longitude}];
-  //       console.log('arr: ', arr);
-  //       setPathPoints(preState => [...preState, {position: positionData.position}]);
-  //     }
-  //   }
-  // }, [currentLocation, initialLocation]);
 
 
   const onTrackingUpdated = (state: ViroTrackingState, reason: ViroTrackingReason) => {
     // console.log('anchor: ', state, ' :: ', reason);
     if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
       setStep(state);
-      // console.log('CALLED');
-      // setPathPoints
-      // Tracking is normal; you can handle further navigation logic here if needed.
     }
   };
 
@@ -85,73 +58,67 @@ const Home = () => {
 
   const oncameraTransformHandler = (cameraTransform: ViroCameraTransform) => {
     const [fx,fy,fz] = cameraTransform.forward;
-    // console.log('fy: ', fy);
-    // const [rx,ry,rz] = cameraTransform.rotation;
+
     const [px,py,pz] = cameraTransform.position;
-    // if (px > 0.3) {
-
-    //   console.log('px,py,pz: ', px,py,pz);
-    // }
-    // console.log('cameraTransform: ', cameraTransform);
-
-  if (fx < -0.8 ) {
-    const obj:Position = {position: [fx, -2, -pathPoints.length + 2]};
-    if (!(initialNumberToSetLeft > 2)) {
+  if (fx < -0.6 ) {
+    const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
+    if (!(initialNumberToSetLeft > 1)) {
       // console.log('LEFT ::: ');
 
       setPathPoints([...pathPoints, obj]);
       initialNumberToSetLeft = initialNumberToSetLeft + 1;
       return;
     }
-    // initialNumberToSetLeft = 0;
-    // console.log('Left::::::::::', fx);
-  }else if(fx > 0.8 ){
-    const obj:Position = {position: [fx, -2, -pathPoints.length + 2]};
-    if (!(initialNumberToSetRight > 2)) {
-      // console.log('RIGHT :::');
 
+  }else if(fx > 0.6 ){
+    const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
+    if (!(initialNumberToSetRight > 1)) {
+      // console.log('RIGHT :::');
       setPathPoints([...pathPoints, obj]);
       initialNumberToSetRight = initialNumberToSetRight + 1;
       return;
     }
-    // initialNumberToSetRight = 0;
-    // console.log('Right::::::::::::', fx);
+
   }else if (pz > 0.5 || pz < -0.5) {
 
-    const xVal = pathPoints[pathPoints.length - 1].position[0];
-    const obj:Position = {position: [xVal, -2, -(pathPoints.length + 2)]};
-    const prevValue = pathPoints[pathPoints.length - 1].position[2]; // Access previous value from ref
-    const difference = prevValue - obj.position[2];
+    // const xVal = pathPoints[pathPoints.length - 1].position[0];
+    // const obj:Position = {position: [xVal, -2, -(pathPoints.length + 2)]};
+    // if (!(initialNumberToSetForward > 2)) {
+    //   initialNumberToSetForward = initialNumberToSetForward + 1;
+    //   setPathPoints([...pathPoints, obj]);
+    //   return;
+    // }
 
+    // if (pathPoints.length === 2) {
+    //   initialNumberToSetForward = 0;
+    // }
 
-    console.log('difference: ', difference);
-    if (!(initialNumberToSetForward > 2)) {
-      // console.log('AAA' , initialNumberToSetForward);
+    if (forwardStepCount < stepThreshold) {
+      if (!(initialNumberToSetForward > 1)) {
+        const xVal = pathPoints[pathPoints.length - 1].position[0];
+        const obj: Position = { position: [xVal, -2, -(pathPoints.length + 2)] };
+        console.log('AAA');
 
-      initialNumberToSetForward = initialNumberToSetForward + 1;
-      setPathPoints([...pathPoints, obj]);
-      return;
+        setPathPoints([...pathPoints, obj]);
+        initialNumberToSetForward += 1;
+      }
+
+      forwardStepCount += 1;
     }
-    prevValueRef.current = pz;
-    if (pathPoints.length === 2) {
-      initialNumberToSetForward = 0;
+
+    // When the forward step count reaches the threshold, reset the counters
+    console.log('forwardStepCount: ', forwardStepCount);
+    if (forwardStepCount === stepThreshold) {
+      console.log(`Reached ${stepThreshold} steps forward!`);
+
+      // Reset forward step count and other counters for the next round
+      forwardStepCount = 0;              // Reset step counter
+      initialNumberToSetLeft = 0;         // Reset left movement counter
+      initialNumberToSetRight = 0;        // Reset right movement counter
+      initialNumberToSetForward = 0;      // Reset forward movement counter
     }
   }
 
-
-
-    // if (pz > (-0.4) || pz > 0.4) {
-      // console.log('CALL ::: ', pz);
-      // if (fx < -0.6 ) {
-      //   const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
-      //   setPathPoints([...pathPoints, obj]);
-      //   // console.log('Left::::::::::', fx);
-      // }else if(fx > 0.6 ){
-      //   const obj:Position = {position: [fx, -2, -pathPoints.length + 1]};
-      //   setPathPoints([...pathPoints, obj]);
-      //   // console.log('Right::::::::::::', fx);
-      // }
-    // }
 
 
   };
