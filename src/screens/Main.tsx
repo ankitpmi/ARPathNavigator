@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, Pressable} from 'react-native';
 import {ViroARSceneNavigator} from '@reactvision/react-viro';
 import Home from './home/Home';
+import ARPathNavigation from './ARPathNavigation';
 // import {useLocationContext} from '../contexts';
 
 const Main = () => {
