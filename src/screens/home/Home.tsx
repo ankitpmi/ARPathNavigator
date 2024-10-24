@@ -9,6 +9,7 @@ import {
   ViroTrackingReason,
   ViroCameraTransform,
 } from '@reactvision/react-viro';
+import { useGlobalContext } from '../../contexts';
 
 let initialNumberToSetLeft = 0;
 let initialNumberToSetRight = 0;
@@ -23,6 +24,8 @@ const Home = () => {
   const [pathPoints, setPathPoints] = useState<Array<Position>>([
     {position: [0, -2, -2]},
   ]);
+  const {isStopTracking, directionHandler, direction} =
+  useGlobalContext();
   const [step, setStep] = useState(0);
   // const prevValueRef = useRef<number>(0);
 
@@ -50,6 +53,9 @@ const Home = () => {
   };
 
   const oncameraTransformHandler = (cameraTransform: ViroCameraTransform) => {
+    if (isStopTracking) {
+      return;
+    }
     const [fx, fy, fz] = cameraTransform.forward;
 
     const [px, py, pz] = cameraTransform.position;
@@ -60,8 +66,8 @@ const Home = () => {
         const lastZval = pathPoints[pathPoints.length - 1].position[2];
         // const obj:Position = {position: [fx - (-0.12) , -2, -pathPoints.length ]};
         const obj: Position = {position: [fx - -0.12, -2, lastZval]};
-
         setPathPoints([...pathPoints, obj]);
+        directionHandler({...direction, left: fx - -0.12});
         initialNumberToSetLeft = initialNumberToSetLeft + 1;
         return;
       }
@@ -76,18 +82,19 @@ const Home = () => {
       // return;
     } else if (fx > 0.6) {
       // console.log('RIGHT :::');
-      if (rightStepCount < stepThreshold) {
-        if (!(initialNumberToSetRight > 2)) {
+      if (rightStepCount <= 0.5) {
+        if (!(initialNumberToSetRight > 1)) {
           const lastZval = pathPoints[pathPoints.length - 1].position[2];
-          const obj: Position = {position: [fx + 0.12, -2, lastZval]};
+          const obj: Position = {position: [fx + 0.12 , -2, lastZval ]};
           setPathPoints([...pathPoints, obj]);
+          directionHandler({...direction, right: fx + 0.12});
           initialNumberToSetRight = initialNumberToSetRight + 1;
           return;
         }
-        rightStepCount += 1;
+        rightStepCount += 0.5;
       }
 
-      if (rightStepCount === stepThreshold) {
+      if (rightStepCount === 0.5) {
         console.log('call right');
 
         // Reset forward step count and other counters for the next round
@@ -125,6 +132,7 @@ const Home = () => {
           const obj: Position = {position: [xVal, -2, zVal]};
 
           setPathPoints([...pathPoints, obj]);
+          directionHandler({...direction, forward: fx + 0.12});
           initialNumberToSetForward += 1;
         }
         forwardStepCount += 1;

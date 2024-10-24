@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, Text, Pressable} from 'react-native';
+import {View, Text, Pressable, TouchableOpacity} from 'react-native';
 import {ViroARSceneNavigator} from '@reactvision/react-viro';
 import Home from './home/Home';
 import ARPathNavigation from './ARPathNavigation';
-// import {useLocationContext} from '../contexts';
+import {useGlobalContext} from '../contexts';
 
 const Main = () => {
-  // const {currentLocation, initialLocation, clearWatchHandler} =
-  //   useLocationContext();
+  const {stopTrackingHandler, direction} =
+  useGlobalContext();
   return (
     <>
       <ViroARSceneNavigator
@@ -16,6 +16,31 @@ const Main = () => {
         }}
         pbrEnabled={true}
       />
+       <View style={{flexDirection: 'row', justifyContent: 'space-evenly', padding: 4}}>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text>Left</Text>
+              <Text>{direction.left}</Text>
+            </View>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text>Forward</Text>
+              <Text>{direction.forward}</Text>
+            </View>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Text>Right</Text>
+              <Text>{direction.right}</Text>
+            </View>
+        </View>
+      <View style={{flexDirection: 'row', justifyContent: 'space-evenly', padding: 4}}>
+
+
+
+        <TouchableOpacity onPress={stopTrackingHandler} style={{width: 160, height: 40, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#ccc'}}>
+          <Text>Stop</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={stopTrackingHandler} style={{width: 160, height: 40, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#ccc'}}>
+          <Text>Start</Text>
+        </TouchableOpacity>
+      </View>
       {/* <View style={{padding: 8}}>
         <View
           style={{

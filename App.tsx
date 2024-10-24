@@ -1,13 +1,12 @@
 import React from 'react';
-import {LocationProvider} from './src/contexts';
+import {GlobalProvider} from './src/contexts';
 import Main from './src/screens/Main';
-import ARLineDrawingApp from './src/screens/Main';
 
 const App = () => {
   return (
-    // <LocationProvider>
+    <GlobalProvider>
       <Main />
-    // </LocationProvider>
+     </GlobalProvider>
   );
 };
 
